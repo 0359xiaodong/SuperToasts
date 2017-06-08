@@ -171,7 +171,7 @@ class ManagerSuperActivityToast extends Handler {
 
                 }
 
-            } catch(IllegalStateException e) {
+            } catch(Exception e) {
 
                 this.cancelAllSuperActivityToastsForActivity(superActivityToast.getActivity());
 
@@ -286,32 +286,34 @@ class ManagerSuperActivityToast extends Handler {
      * Removes all SuperActivityToasts and clears the list for a specific activity
      */
     void cancelAllSuperActivityToastsForActivity(Activity activity) {
+        try {
+            Iterator<SuperActivityToast> superActivityToastIterator = mList
+                    .iterator();
 
-        Iterator<SuperActivityToast> superActivityToastIterator = mList
-                .iterator();
+            while (superActivityToastIterator.hasNext()) {
 
-        while (superActivityToastIterator.hasNext()) {
+                SuperActivityToast superActivityToast = superActivityToastIterator
+                        .next();
 
-            SuperActivityToast superActivityToast = superActivityToastIterator
-                    .next();
+                if ((superActivityToast.getActivity()) != null
+                        && superActivityToast.getActivity().equals(activity)) {
 
-            if ((superActivityToast.getActivity()) != null
-                    && superActivityToast.getActivity().equals(activity)) {
+                    if (superActivityToast.isShowing()) {
 
-                if (superActivityToast.isShowing()) {
+                        superActivityToast.getViewGroup().removeView(
+                                superActivityToast.getView());
 
-                    superActivityToast.getViewGroup().removeView(
-                            superActivityToast.getView());
+                    }
+
+                    removeMessages(Messages.DISPLAY, superActivityToast);
+                    removeMessages(Messages.REMOVE, superActivityToast);
+
+                    superActivityToastIterator.remove();
 
                 }
 
-                removeMessages(Messages.DISPLAY, superActivityToast);
-                removeMessages(Messages.REMOVE, superActivityToast);
-
-                superActivityToastIterator.remove();
-
             }
-
+        } catch(Exception e) {
         }
 
     }
